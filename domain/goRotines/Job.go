@@ -2,6 +2,7 @@ package goRotines
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/Pallinder/go-randomdata"
 	"github.com/streadway/amqp"
@@ -23,7 +24,7 @@ func (q *Job) working(tasks <-chan amqp.Delivery, hireWorkers *HireWorkers) {
 	}
 }
 func (q *Job) Jobs(hireWorkers *HireWorkers) {
-
+	fmt.Println(q)
 	for {
 		select {
 		case <-q.Sync.GoWork:

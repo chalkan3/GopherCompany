@@ -3,6 +3,7 @@ package goRotines
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"o2b.com.br/WhatsAppProcessWorker/domain"
@@ -30,14 +31,15 @@ func (c *HireWorkers) TimeToHire() {
 	}
 
 }
-func (c *HireWorkers) ToWork(workerName string, done chan int, message *entities.Message) {
-	log.Printf("******************* WORKER " + workerName + " START TO WORK ******************************")
 
+func (c *HireWorkers) ToWork(workerName string, done chan int, message *entities.Message) {
 	worker := domain.NewWorker()
 	worker.Message = message
 
+	messageID := strconv.FormatInt(message.ID, 10)
+	log.Printf("Gopher [" + workerName + "] says: I'll process your order number[" + messageID + "]")
 	worker.Process()
-	log.Printf("******************* WORKER IS RESTING A LITTLE ******************************")
+	log.Printf("Gopher [" + workerName + "] says: The order number[" + messageID + "] done")
 	done <- 1
 
 }
