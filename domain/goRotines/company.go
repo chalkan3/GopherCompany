@@ -10,10 +10,9 @@ import (
 
 // GopherCompany my company for process jobs
 type GopherCompany struct {
-	TeamWork         *sync.Sync
-	HumansManagement *HireWorkers
-	TeamLeader       *Job
-	Jobs             *infra.RabbitMQ
+	TeamWork   *sync.Sync
+	TeamLeader *TeamLeader
+	Jobs       *infra.RabbitMQ
 }
 
 /*
@@ -27,26 +26,20 @@ type GopherCompany struct {
 */
 
 // HireTeamLeader create the jobs workers
-func (company *GopherCompany) hireTeamLeader() *GopherCompany {
-	company.TeamLeader = NewJob(company.Jobs, company.TeamWork)
-	return company
-}
-
-// HireHumansManagement create new syncronize gophers
-func (company *GopherCompany) hireHumansManagement() *GopherCompany {
-	company.HumansManagement = NewWorkers(company.TeamWork)
+func (company *GopherCompany) hireTeamLeaderHumansManagement() *GopherCompany {
+	company.TeamLeader = NewTeamLeader(company.TeamWork).HireHumansManagement()
 	return company
 }
 
 // HireNewEmployee syncronize the workers
-func (company *GopherCompany) hireNewEmployee() {
+func (company *GopherCompany) findEmployee() {
 	var hireFirstEmployee bool = true
-	company.HumansManagement.ToHireWorkers(hireFirstEmployee)
+	company.TeamLeader.HumansManagement.ToHireWorkers(hireFirstEmployee)
 }
 
 // TasksTodo work on new jobs
 func (company *GopherCompany) tasksTodo() *GopherCompany {
-	company.TeamLeader.Jobs(company.HumansManagement)
+	company.TeamLeader.Jobs()
 	return company
 }
 
@@ -68,18 +61,18 @@ func (company *GopherCompany) ceoWorking() {
 // GophersWork block main thread
 func (company *GopherCompany) GophersWork() {
 	log.Println("GOPHERS ARE WORKING HERE")
-	go company.hireNewEmployee()
+	go company.findEmployee()
 	go company.tasksTodo()
 	company.ceoWorking()
 }
 
-// FindTeamLeaders build gorotines syncronizes
+// FindTeamLeaders costructor of my syncronizer e o job
 func (company *GopherCompany) FindTeamLeaders() *GopherCompany {
-	return company.hireHumansManagement().hireTeamLeader()
+	return company.hireTeamLeaderHumansManagement()
 }
 
-// NewGopherCompany constructor
-func NewGopherCompany() *GopherCompany {
+// FoundGopherCompany constructor
+func FoundGopherCompany() *GopherCompany {
 	return &GopherCompany{
 		TeamWork: sync.NewSync(),
 		Jobs:     infra.NewRabbitMQ(),

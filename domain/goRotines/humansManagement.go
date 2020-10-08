@@ -1,38 +1,26 @@
 package goRotines
 
 import (
-	"fmt"
 	"log"
 	"strconv"
-	"time"
 
 	"o2b.com.br/WhatsAppProcessWorker/domain"
 	"o2b.com.br/WhatsAppProcessWorker/domain/entities"
 	"o2b.com.br/WhatsAppProcessWorker/domain/sync"
 )
 
-type HireWorkers struct {
-	Sync        *sync.Sync
+type HumansManagement struct {
+	Talk        *sync.Sync
 	CompanySize int
 	Workers     int
 }
 
-func (c *HireWorkers) hiredGetACoffe() {
+func (c *HumansManagement) hiredGetACoffe() {
 	c.Workers = c.Workers + 1
-	c.Sync.GoWork <- true
-}
-func (c *HireWorkers) TimeToHire() {
-	for {
-		fmt.Println("dasd")
-		time.Sleep(5 * time.Second)
-		c.Sync.ToHire <- true
-		fmt.Println("tohire")
-
-	}
-
+	c.Talk.GoWork <- true
 }
 
-func (c *HireWorkers) ToWork(workerName string, done chan int, message *entities.Message) {
+func (c *HumansManagement) ToWork(workerName string, done chan int, message *entities.Message) {
 	worker := domain.NewWorker()
 	worker.Message = message
 
@@ -43,24 +31,24 @@ func (c *HireWorkers) ToWork(workerName string, done chan int, message *entities
 	done <- 1
 
 }
-func (c *HireWorkers) handShakeFirstEmployee(firstEmployee bool) bool {
+func (c *HumansManagement) handShakeFirstEmployee(firstEmployee bool) bool {
 	c.hiredGetACoffe()
 	return false
 }
 
-func (c *HireWorkers) ToHireWorkers(firstEmployee bool) {
+func (c *HumansManagement) ToHireWorkers(firstEmployee bool) {
 	for {
 		select {
-		case <-c.Sync.ToHire:
+		case <-c.Talk.ToHire:
 			select {
-			case <-c.Sync.Done:
+			case <-c.Talk.Done:
 				if c.Workers < c.CompanySize {
-					c.Sync.Hired <- true
+					c.Talk.Hired <- true
 				}
 			default:
 
 			}
-		case <-c.Sync.Hired:
+		case <-c.Talk.Hired:
 			c.hiredGetACoffe()
 		default:
 			firstEmployee = c.handShakeFirstEmployee(firstEmployee)
@@ -69,9 +57,9 @@ func (c *HireWorkers) ToHireWorkers(firstEmployee bool) {
 
 }
 
-func NewWorkers(_sync *sync.Sync) *HireWorkers {
-	return &HireWorkers{
-		Sync:        _sync,
+func NewHumansManagement(_sync *sync.Sync) *HumansManagement {
+	return &HumansManagement{
+		Talk:        _sync,
 		CompanySize: 3,
 		Workers:     0,
 	}

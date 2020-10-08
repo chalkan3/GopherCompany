@@ -1,9 +1,9 @@
 package main
 
 import (
-	CEO "o2b.com.br/WhatsAppProcessWorker/domain/goRotines"
+	Founder "o2b.com.br/WhatsAppProcessWorker/domain/goRotines"
 )
 
 func main() {
-	CEO.NewGopherCompany().FindTeamLeaders().GophersWork()
+	Founder.FoundGopherCompany().FindTeamLeaders().GophersWork()
 }
