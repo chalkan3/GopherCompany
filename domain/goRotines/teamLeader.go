@@ -10,14 +10,20 @@ import (
 	"o2b.com.br/WhatsAppProcessWorker/infra"
 )
 
+type WorkPile struct {
+	Name string
+	Pile *infra.RabbitMQ
+}
+
 type TeamLeader struct {
 	TeamTalk         *sync.Sync
-	WorkPile         *infra.RabbitMQ
+	WorkPile         *WorkPile
 	HumansManagement *HumansManagement
+	WorkPileName     string
 }
 
 func (teamLeader *TeamLeader) getNewTasks() <-chan amqp.Delivery {
-	return teamLeader.WorkPile.Consume()
+	return teamLeader.WorkPile.Pile.Consume(teamLeader.WorkPile.Name)
 }
 
 func (teamLeader *TeamLeader) working(tasks <-chan amqp.Delivery) {
@@ -52,6 +58,9 @@ func (teamLeader *TeamLeader) Jobs() {
 func NewTeamLeader(_sync *sync.Sync) *TeamLeader {
 	return &TeamLeader{
 		TeamTalk: _sync,
-		WorkPile: infra.NewRabbitMQ(),
+		WorkPile: &WorkPile{
+			Name: "process",
+			Pile: infra.NewRabbitMQ(),
+		},
 	}
 }

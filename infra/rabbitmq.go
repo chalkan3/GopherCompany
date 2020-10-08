@@ -33,9 +33,9 @@ func (mq *RabbitMQ) connectionChannel() *amqp.Channel {
 	return ch
 
 }
-func (mq *RabbitMQ) declareQueue() (*amqp.Queue, *amqp.Channel) {
+func (mq *RabbitMQ) declareQueue(queueName string) (*amqp.Queue, *amqp.Channel) {
 	processQueue := linq.From(mq.Queue).Where(func(c interface{}) bool {
-		return c.(Queue).Name == "process"
+		return c.(Queue).Name == queueName
 	}).First().(Queue)
 
 	ch := mq.connectionChannel()
@@ -60,9 +60,9 @@ func (mq *RabbitMQ) formatAmpqURI() string {
 }
 
 // Publish publish to rabbitmq queue
-func (mq *RabbitMQ) Publish(payload string) {
+func (mq *RabbitMQ) Publish(payload string, queueName string) {
 
-	q, ch := mq.declareQueue()
+	q, ch := mq.declareQueue(queueName)
 
 	err := ch.Publish(
 		"",     // exchange
@@ -77,9 +77,9 @@ func (mq *RabbitMQ) Publish(payload string) {
 }
 
 // Consume publish to rabbitmq queue
-func (mq *RabbitMQ) Consume() <-chan amqp.Delivery {
+func (mq *RabbitMQ) Consume(queueName string) <-chan amqp.Delivery {
 
-	q, ch := mq.declareQueue()
+	q, ch := mq.declareQueue(queueName)
 	msgs, err := ch.Consume(
 		q.Name, // queue
 		"",     // consumer
