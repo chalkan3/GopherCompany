@@ -11,6 +11,13 @@
                 "delete_when_unused": false,
                 "exclusive": false,
                 "no_wait": false
+            },
+            {
+                "name": "sync",
+                "durable": false,
+                "delete_when_unused": false,
+                "exclusive": false,
+                "no_wait": false
             }
         ]
     }

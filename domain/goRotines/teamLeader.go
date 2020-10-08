@@ -7,13 +7,7 @@ import (
 	"github.com/streadway/amqp"
 	"o2b.com.br/WhatsAppProcessWorker/domain/entities"
 	"o2b.com.br/WhatsAppProcessWorker/domain/sync"
-	"o2b.com.br/WhatsAppProcessWorker/infra"
 )
-
-type WorkPile struct {
-	Name string
-	Pile *infra.RabbitMQ
-}
 
 type TeamLeader struct {
 	TeamTalk         *sync.Sync
@@ -23,14 +17,14 @@ type TeamLeader struct {
 }
 
 func (teamLeader *TeamLeader) getNewTasks() <-chan amqp.Delivery {
-	return teamLeader.WorkPile.Pile.Consume(teamLeader.WorkPile.Name)
+	return teamLeader.WorkPile.Pile.Consume(teamLeader.WorkPile.TodoPile.Name)
 }
 
 func (teamLeader *TeamLeader) working(tasks <-chan amqp.Delivery) {
 	for task := range tasks {
 		var message entities.Message
 		json.Unmarshal(task.Body, &message)
-		go teamLeader.HumansManagement.ToWork(randomdata.FullName(randomdata.Female), teamLeader.TeamTalk.Done, &message)
+		go teamLeader.HumansManagement.ToWork(randomdata.FullName(randomdata.Female), teamLeader.TeamTalk.Done, &message, teamLeader.WorkPile)
 	}
 }
 
@@ -58,9 +52,6 @@ func (teamLeader *TeamLeader) Jobs() {
 func NewTeamLeader(_sync *sync.Sync) *TeamLeader {
 	return &TeamLeader{
 		TeamTalk: _sync,
-		WorkPile: &WorkPile{
-			Name: "process",
-			Pile: infra.NewRabbitMQ(),
-		},
+		WorkPile: NewWorkPile("sync", "process"),
 	}
 }

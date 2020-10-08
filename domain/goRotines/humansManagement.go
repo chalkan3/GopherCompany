@@ -4,7 +4,6 @@ import (
 	"log"
 	"strconv"
 
-	"o2b.com.br/WhatsAppProcessWorker/domain"
 	"o2b.com.br/WhatsAppProcessWorker/domain/entities"
 	"o2b.com.br/WhatsAppProcessWorker/domain/sync"
 )
@@ -20,13 +19,11 @@ func (c *HumansManagement) hiredGetACoffe() {
 	c.Talk.GoWork <- true
 }
 
-func (c *HumansManagement) ToWork(workerName string, done chan int, message *entities.Message) {
-	worker := domain.NewWorker()
-	worker.Message = message
+func (c *HumansManagement) ToWork(workerName string, done chan int, message *entities.Message, workPile *WorkPile) {
 
 	messageID := strconv.FormatInt(message.ID, 10)
 	log.Printf("Gopher [" + workerName + "] says: I'll process your order number[" + messageID + "]")
-	worker.Process()
+	NewWorker(message, workPile).Process()
 	log.Printf("Gopher [" + workerName + "] says: The order number[" + messageID + "] done")
 	done <- 1
 
