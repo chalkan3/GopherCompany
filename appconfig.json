@@ -1,9 +1,9 @@
 { 
     "rabbitmq": {
-        "user": "guest",    
-        "password": "guest",    
+        "user": "user",    
+        "password": "dEPwDbp6hW",    
         "port": "5672",         
-        "host": "rabbitmq",
+        "host": "gopher-company-rabbitmq.gopher-company-shared.svc",
         "queue": [
             {
                 "name": "process",
