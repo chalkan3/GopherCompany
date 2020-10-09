@@ -23,6 +23,6 @@ WORKDIR /root/
 COPY --from=builder /app/worker .
 COPY appconfig.json .
 # Expose port 8080 to the outside world
-EXPOSE 9000
+EXPOSE 8080
 # Command to run the executable
 CMD ["./worker"]
