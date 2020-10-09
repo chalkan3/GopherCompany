@@ -7,9 +7,10 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: 9001
       targetPort: http
       protocol: TCP
       name: http
+      targetPort: 9001
   selector:
     {{- include "processworker.selectorLabels" . | nindent 4 }}
